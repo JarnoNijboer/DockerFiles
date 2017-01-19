@@ -23,7 +23,6 @@ RUN Invoke-WebRequest 'https://download.microsoft.com/download/1/6/B/16B06F60-3B
 
 # Install PHP
 RUN Invoke-WebRequest $('http://windows.php.net/downloads/releases/php-{0}-nts-Win32-VC11-x86.zip' -f $env:PHP_VERSION) -OutFile 'php.zip'; \
-    if ((Get-FileHash php.zip -Algorithm sha1).Hash -ne $env:PHP_SHA1) {exit 1} ; \
     Expand-Archive -Path php.zip -DestinationPath c:\php; \
     Remove-Item php.zip;
 
