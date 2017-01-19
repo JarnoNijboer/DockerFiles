@@ -4,17 +4,14 @@ LABEL Name=nginx-php-sqlserver Version=0.0.1
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-ENV PHP_VERSION 7.1.0
+ENV PHP_VERSION 5.6.30
 ENV NGINX_VERSION 1.11.8
-ENV
 
 WORKDIR /Users/ContainerAdministrator/Downloads
 
 # Install nginx
 RUN Invoke-WebRequest $('http://nginx.org/download/nginx-{0}.zip' -f $env:NGINX_VERSION) -OutFile 'nginx.zip'; \
     Expand-Archive -Path nginx.zip -DestinationPath c:\nginx; \
-    [Environment]::SetEnvironmentVariable('PATH', $env:Path + ';C:\nginx', [EnvironmentVariableTarget]::Machine); \
-    $env:PATH = [Environment]::GetEnvironmentVariable('PATH', [EnvironmentVariableTarget]::Machine); \
     Remove-Item nginx.zip;
 
 # Visual C++ Redistributable
@@ -25,11 +22,9 @@ RUN Invoke-WebRequest 'https://download.microsoft.com/download/1/6/B/16B06F60-3B
     Remove-Item vcredist_x86.exe;
 
 # Install PHP
-RUN Invoke-WebRequest $('http://windows.php.net/downloads/releases/php-{0}-nts-Win32-VC11-x64.zip' -f $env:PHP_VERSION) -OutFile 'php.zip'; \
+RUN Invoke-WebRequest $('http://windows.php.net/downloads/releases/php-{0}-nts-Win32-VC11-x86.zip' -f $env:PHP_VERSION) -OutFile 'php.zip'; \
     if ((Get-FileHash php.zip -Algorithm sha1).Hash -ne $env:PHP_SHA1) {exit 1} ; \
     Expand-Archive -Path php.zip -DestinationPath c:\php; \
-    [Environment]::SetEnvironmentVariable('PATH', $env:Path + ';C:\php', [EnvironmentVariableTarget]::Machine); \
-    $env:PATH = [Environment]::GetEnvironmentVariable('PATH', [EnvironmentVariableTarget]::Machine); \
     Remove-Item php.zip;
 
 # SQL Server driver for PHP
