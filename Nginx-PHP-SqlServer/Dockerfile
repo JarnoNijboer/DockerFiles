@@ -37,9 +37,18 @@ RUN Invoke-WebRequest 'https://download.microsoft.com/download/C/D/B/CDB0A3BB-60
     .\sqlsrv32.exe /q /t:c:\php\ext /c; \
     Remove-Item sqlsrv32.exe;
 
+# Download HiddenConsole
+RUN Invoke-WebRequest 'http://redmine.lighttpd.net/attachments/660/RunHiddenConsole.zip' -OutFile 'RunHiddenConsole.zip'; \
+    Expand-Archive -Path RunHiddenConsole.zip -DestinationPath c:\; \
+    Remove-Item RunHiddenConsole.zip;
+
 # Copy php.ini
 ADD php.ini /php/php.ini
 
-# WORKDIR /nginx
+# Copy ngix conf
+ADD nginx.conf /nginx/conf/nginx.conf
 
-# CMD ["/nginx/nginx.exe"]
+# Copy bat file
+ADD start-nginx.bat /start-nginx.bat
+
+CMD ["/start-nginx.bat"]
