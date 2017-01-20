@@ -45,4 +45,12 @@ ADD nginx.conf /nginx/conf/nginx.conf
 # Copy bat file
 ADD start-nginx.bat /start-nginx.bat
 
-CMD ["/start-nginx.bat"]
+# Workaround for volume mounting point in container
+# https://github.com/StefanScherer/dockerfiles-windows/blob/9fd8ce461ea48f206ae1c3a09680d7f70dad65db/node-example/README.md#node-example
+VOLUME C:/www
+RUN set-itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\DOS Devices' -Name 'G:' -Value '\??\C:\www' -Type String
+
+WORKDIR 'G:\\'
+
+# Start nginx + php
+CMD ["/start-nginx-php.bat.bat"]
