@@ -11,7 +11,8 @@ WORKDIR /Users/ContainerAdministrator/Downloads
 
 # Install nginx
 RUN Invoke-WebRequest $('http://nginx.org/download/nginx-{0}.zip' -f $env:NGINX_VERSION) -OutFile 'nginx.zip'; \
-    Expand-Archive -Path nginx.zip -DestinationPath c:\nginx; \
+    Expand-Archive -Path nginx.zip -DestinationPath c:\; \
+    Rename-Item $('c:/nginx-{0}' -f $env:NGINX_VERSION) c:\nginx; \
     Remove-Item nginx.zip;
 
 # Visual C++ Redistributable
@@ -32,9 +33,9 @@ RUN Invoke-WebRequest 'https://download.microsoft.com/download/C/D/B/CDB0A3BB-60
     Remove-Item sqlsrv32.exe;
 
 # Download HiddenConsole
-RUN Invoke-WebRequest 'http://redmine.lighttpd.net/attachments/660/RunHiddenConsole.zip' -OutFile 'RunHiddenConsole.zip'; \
-    Expand-Archive -Path RunHiddenConsole.zip -DestinationPath c:\; \
-    Remove-Item RunHiddenConsole.zip;
+# RUN Invoke-WebRequest 'http://redmine.lighttpd.net/attachments/660/RunHiddenConsole.zip' -OutFile 'RunHiddenConsole.zip'; \
+#     Expand-Archive -Path RunHiddenConsole.zip -DestinationPath c:\; \
+#     Remove-Item RunHiddenConsole.zip;
 
 # Copy php.ini
 ADD php.ini /php/php.ini
@@ -43,14 +44,21 @@ ADD php.ini /php/php.ini
 ADD nginx.conf /nginx/conf/nginx.conf
 
 # Copy bat file
-ADD start-nginx-php.bat /start-nginx-php.bat
+# ADD start-nginx-php.bat /start-nginx-php.bat
 
 # Workaround for volume mounting point in container
 # https://github.com/StefanScherer/dockerfiles-windows/blob/9fd8ce461ea48f206ae1c3a09680d7f70dad65db/node-example/README.md#node-example
-VOLUME C:/www
-RUN set-itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\DOS Devices' -Name 'G:' -Value '\??\C:\www' -Type String
+# VOLUME C:/www
+# RUN set-itemproperty -path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\DOS Devices' -Name 'G:' -Value '\??\C:\www' -Type String
 
-WORKDIR 'G:\\'
+# WORKDIR 'G:\\'
+
+# Expose port
+EXPOSE 80
 
 # Start nginx + php
-CMD ["/start-nginx-php.bat"]
+WORKDIR /nginx-1.9.13
+
+CMD ["/nginx-1.9.13/nginx.exe"]
+# CMD ["c:/php/php-cgi.exe -b 127.0.0.1:9123"]
+# CMD ["c:/start-nginx-php.bat"]
